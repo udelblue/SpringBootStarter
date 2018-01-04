@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/udelblue/SpringBootStarter.svg?branch=master)](https://travis-ci.org/udelblue/SpringBootStarter)  
 
-# Starter
+## Starter Skeleton
 Startup-ready web skeleton  
 Application runs on port 8080 
 config app by modifying application.properties  
