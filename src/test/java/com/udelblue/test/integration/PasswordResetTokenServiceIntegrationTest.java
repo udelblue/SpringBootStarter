@@ -13,42 +13,41 @@ import com.udelblue.StarterApplication;
 import com.udelblue.backend.persistence.domain.backend.PasswordResetToken;
 import com.udelblue.backend.persistence.domain.backend.User;
 import com.udelblue.backend.service.PasswordResetTokenService;
-import com.udelblue.backend.service.UserService;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = StarterApplication.class)
 public class PasswordResetTokenServiceIntegrationTest extends AbstractServiceIntegrationTest {
 
-    @Autowired
-    private PasswordResetTokenService passwordResetTokenService;
+	@Autowired
+	private PasswordResetTokenService passwordResetTokenService;
 
-    @Rule public TestName testName = new TestName();
+	@Rule
+	public TestName testName = new TestName();
 
-    @Test
-    public void testCreateNewTokenForUserEmail() throws Exception {
+	@Test
+	public void testCreateNewTokenForUserEmail() throws Exception {
 
-        User user = createUser(testName);
+		User user = createUser(testName);
 
-        PasswordResetToken passwordResetToken =
-                passwordResetTokenService.createPasswordResetTokenForEmail(user.getEmail());
-        Assert.assertNotNull(passwordResetToken);
-        Assert.assertNotNull(passwordResetToken.getToken());
+		PasswordResetToken passwordResetToken = passwordResetTokenService
+				.createPasswordResetTokenForEmail(user.getEmail());
+		Assert.assertNotNull(passwordResetToken);
+		Assert.assertNotNull(passwordResetToken.getToken());
 
-    }
+	}
 
-    @Test
-    public void testFindByToken() throws Exception {
-        User user = createUser(testName);
+	@Test
+	public void testFindByToken() throws Exception {
+		User user = createUser(testName);
 
-        PasswordResetToken passwordResetToken =
-                passwordResetTokenService.createPasswordResetTokenForEmail(user.getEmail());
-        Assert.assertNotNull(passwordResetToken);
-        Assert.assertNotNull(passwordResetToken.getToken());
+		PasswordResetToken passwordResetToken = passwordResetTokenService
+				.createPasswordResetTokenForEmail(user.getEmail());
+		Assert.assertNotNull(passwordResetToken);
+		Assert.assertNotNull(passwordResetToken.getToken());
 
-        PasswordResetToken token = passwordResetTokenService.findByToken(passwordResetToken.getToken());
-        Assert.assertNotNull(token);
+		PasswordResetToken token = passwordResetTokenService.findByToken(passwordResetToken.getToken());
+		Assert.assertNotNull(token);
 
-    }
+	}
 
 }

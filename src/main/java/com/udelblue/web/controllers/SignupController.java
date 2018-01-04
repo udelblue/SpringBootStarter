@@ -44,188 +44,181 @@ import com.udelblue.utils.UserUtils;
 import com.udelblue.web.domain.frontend.BasicAccountPayload;
 import com.udelblue.web.domain.frontend.ProAccountPayload;
 
-
 @Controller
-public class    SignupController {
+public class SignupController {
 
-    @Autowired
-    private PlanService planService;
+	@Autowired
+	private PlanService planService;
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
+	@Autowired
+	private StripeService stripeService;
 
+	/** The application logger */
+	private static final Logger LOG = LoggerFactory.getLogger(SignupController.class);
 
-    @Autowired
-    private StripeService stripeService;
+	public static final String SIGNUP_URL_MAPPING = "/signup";
 
-    /** The application logger */
-    private static final Logger LOG = LoggerFactory.getLogger(SignupController.class);
+	public static final String PAYLOAD_MODEL_KEY_NAME = "payload";
 
-    public static final String SIGNUP_URL_MAPPING = "/signup";
+	public static final String SUBSCRIPTION_VIEW_NAME = "registration/signup";
 
-    public static final String PAYLOAD_MODEL_KEY_NAME = "payload";
+	public static final String DUPLICATED_USERNAME_KEY = "duplicatedUsername";
 
-    public static final String SUBSCRIPTION_VIEW_NAME = "registration/signup";
+	public static final String DUPLICATED_EMAIL_KEY = "duplicatedEmail";
 
-    public static final String DUPLICATED_USERNAME_KEY = "duplicatedUsername";
+	public static final String SIGNED_UP_MESSAGE_KEY = "signedUp";
 
-    public static final String DUPLICATED_EMAIL_KEY = "duplicatedEmail";
+	public static final String ERROR_MESSAGE_KEY = "message";
 
-    public static final String SIGNED_UP_MESSAGE_KEY = "signedUp";
+	public static final String GENERIC_ERROR_VIEW_NAME = "error/genericError";
 
-    public static final String ERROR_MESSAGE_KEY = "message";
+	@RequestMapping(value = SIGNUP_URL_MAPPING, method = RequestMethod.GET)
+	public String signupGet(@RequestParam("planId") int planId, ModelMap model) {
 
-    public static final String GENERIC_ERROR_VIEW_NAME = "error/genericError";
+		if (planId != PlansEnum.BASIC.getId() && planId != PlansEnum.PRO.getId()) {
+			throw new IllegalArgumentException("Plan id is not valid");
+		}
+		model.addAttribute(PAYLOAD_MODEL_KEY_NAME, new ProAccountPayload());
 
-    @RequestMapping(value = SIGNUP_URL_MAPPING, method = RequestMethod.GET)
-    public String signupGet(@RequestParam("planId") int planId, ModelMap model) {
+		return SUBSCRIPTION_VIEW_NAME;
+	}
 
-        if (planId != PlansEnum.BASIC.getId() && planId != PlansEnum.PRO.getId()) {
-            throw new IllegalArgumentException("Plan id is not valid");
-        }
-        model.addAttribute(PAYLOAD_MODEL_KEY_NAME, new ProAccountPayload());
+	@RequestMapping(value = SIGNUP_URL_MAPPING, method = RequestMethod.POST)
+	public String signUpPost(@RequestParam(name = "planId", required = true) int planId,
+			// @RequestParam(name = "file", required = false) MultipartFile file,
+			@ModelAttribute(PAYLOAD_MODEL_KEY_NAME) @Valid ProAccountPayload payload, ModelMap model)
+			throws IOException {
 
-        return SUBSCRIPTION_VIEW_NAME;
-    }
+		if (planId != PlansEnum.BASIC.getId() && planId != PlansEnum.PRO.getId()) {
+			model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
+			model.addAttribute(ERROR_MESSAGE_KEY, "Plan id does not exist");
+			return SUBSCRIPTION_VIEW_NAME;
+		}
 
-    @RequestMapping(value = SIGNUP_URL_MAPPING, method = RequestMethod.POST)
-    public String signUpPost(@RequestParam(name = "planId", required = true) int planId,
-                            // @RequestParam(name = "file", required = false) MultipartFile file,
-                             @ModelAttribute(PAYLOAD_MODEL_KEY_NAME) @Valid ProAccountPayload payload,
-                             ModelMap model) throws IOException {
+		this.checkForDuplicates(payload, model);
 
-        if (planId != PlansEnum.BASIC.getId() && planId != PlansEnum.PRO.getId()) {
-            model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
-            model.addAttribute(ERROR_MESSAGE_KEY, "Plan id does not exist");
-            return SUBSCRIPTION_VIEW_NAME;
-        }
+		boolean duplicates = false;
 
-        this.checkForDuplicates(payload, model);
+		List<String> errorMessages = new ArrayList<>();
 
-        boolean duplicates = false;
+		if (model.containsKey(DUPLICATED_USERNAME_KEY)) {
+			LOG.warn("The username already exists. Displaying error to the user");
+			model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
+			errorMessages.add("Username already exist");
+			duplicates = true;
+		}
 
-        List<String> errorMessages = new ArrayList<>();
+		if (model.containsKey(DUPLICATED_EMAIL_KEY)) {
+			LOG.warn("The email already exists. Displaying error to the user");
+			model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
+			errorMessages.add("Email already exist");
+			duplicates = true;
+		}
 
-        if (model.containsKey(DUPLICATED_USERNAME_KEY)) {
-            LOG.warn("The username already exists. Displaying error to the user");
-            model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
-            errorMessages.add("Username already exist");
-            duplicates = true;
-        }
+		if (duplicates) {
+			model.addAttribute(ERROR_MESSAGE_KEY, errorMessages);
+			return SUBSCRIPTION_VIEW_NAME;
+		}
 
-        if (model.containsKey(DUPLICATED_EMAIL_KEY)) {
-            LOG.warn("The email already exists. Displaying error to the user");
-            model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
-            errorMessages.add("Email already exist");
-            duplicates = true;
-        }
+		// There are certain info that the user doesn't set, such as profile image URL,
+		// Stripe customer id,
+		// plans and roles
+		LOG.debug("Transforming user payload into User domain object");
+		User user = UserUtils.fromWebUserToDomainUser(payload);
 
-        if (duplicates) {
-            model.addAttribute(ERROR_MESSAGE_KEY, errorMessages);
-            return SUBSCRIPTION_VIEW_NAME;
-        }
+		// Sets the Plan and the Roles (depending on the chosen plan)
+		LOG.debug("Retrieving plan from the database");
+		Plan selectedPlan = planService.findPlanById(planId);
+		if (null == selectedPlan) {
+			LOG.error("The plan id {} could not be found. Throwing exception.", planId);
+			model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
+			model.addAttribute(ERROR_MESSAGE_KEY, "Plan id not found");
+			return SUBSCRIPTION_VIEW_NAME;
+		}
+		user.setPlan(selectedPlan);
 
+		User registeredUser = null;
 
-        // There are certain info that the user doesn't set, such as profile image URL, Stripe customer id,
-        // plans and roles
-        LOG.debug("Transforming user payload into User domain object");
-        User user = UserUtils.fromWebUserToDomainUser(payload);
+		// By default users get the BASIC ROLE
+		Set<UserRole> roles = new HashSet<>();
+		if (planId == PlansEnum.BASIC.getId()) {
+			roles.add(new UserRole(user, new Role(RolesEnum.BASIC)));
+			registeredUser = userService.createUser(user, PlansEnum.BASIC, roles);
+		} else {
+			roles.add(new UserRole(user, new Role(RolesEnum.PRO)));
 
+			// Extra precaution in case the POST method is invoked programmatically
+			if (StringUtils.isEmpty(payload.getCardCode()) || StringUtils.isEmpty(payload.getCardNumber())
+					|| StringUtils.isEmpty(payload.getCardMonth()) || StringUtils.isEmpty(payload.getCardYear())) {
+				LOG.error("One or more credit card fields is null or empty. Returning error to the user");
+				model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
+				model.addAttribute(ERROR_MESSAGE_KEY, "One of more credit card details is null or empty.");
+				return SUBSCRIPTION_VIEW_NAME;
 
-        // Sets the Plan and the Roles (depending on the chosen plan)
-        LOG.debug("Retrieving plan from the database");
-        Plan selectedPlan = planService.findPlanById(planId);
-        if (null == selectedPlan) {
-            LOG.error("The plan id {} could not be found. Throwing exception.", planId);
-            model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
-            model.addAttribute(ERROR_MESSAGE_KEY, "Plan id not found");
-            return SUBSCRIPTION_VIEW_NAME;
-        }
-        user.setPlan(selectedPlan);
+			}
 
-        User registeredUser = null;
+			// If the user has selected the pro account, creates the Stripe customer to
+			// store the stripe customer id in
+			// the db
+			Map<String, Object> stripeTokenParams = StripeUtils.extractTokenParamsFromSignupPayload(payload);
 
-        // By default users get the BASIC ROLE
-        Set<UserRole> roles = new HashSet<>();
-        if (planId == PlansEnum.BASIC.getId()) {
-            roles.add(new UserRole(user, new Role(RolesEnum.BASIC)));
-            registeredUser = userService.createUser(user, PlansEnum.BASIC, roles);
-        } else {
-            roles.add(new UserRole(user, new Role(RolesEnum.PRO)));
+			Map<String, Object> customerParams = new HashMap<String, Object>();
+			customerParams.put("description", "Application customer. Username: " + payload.getUsername());
+			customerParams.put("email", payload.getEmail());
+			customerParams.put("plan", selectedPlan.getId());
+			LOG.info("Subscribing the customer to plan {}", selectedPlan.getName());
+			String stripeCustomerId = stripeService.createCustomer(stripeTokenParams, customerParams);
+			LOG.info("Username: {} has been subscribed to Stripe", payload.getUsername());
 
-            // Extra precaution in case the POST method is invoked programmatically
-            if (StringUtils.isEmpty(payload.getCardCode()) ||
-                    StringUtils.isEmpty(payload.getCardNumber()) ||
-                    StringUtils.isEmpty(payload.getCardMonth()) ||
-                    StringUtils.isEmpty(payload.getCardYear())) {
-                LOG.error("One or more credit card fields is null or empty. Returning error to the user");
-                model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
-                model.addAttribute(ERROR_MESSAGE_KEY, "One of more credit card details is null or empty.");
-                return SUBSCRIPTION_VIEW_NAME;
+			user.setStripeCustomerId(stripeCustomerId);
 
-            }
+			registeredUser = userService.createUser(user, PlansEnum.PRO, roles);
+			LOG.debug(payload.toString());
+		}
 
-            // If the user has selected the pro account, creates the Stripe customer to store the stripe customer id in
-            // the db
-            Map<String, Object> stripeTokenParams = StripeUtils.extractTokenParamsFromSignupPayload(payload);
+		// Auto logins the registered user
+		Authentication auth = new UsernamePasswordAuthenticationToken(registeredUser, null,
+				registeredUser.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(auth);
 
-            Map<String, Object> customerParams = new HashMap<String, Object>();
-            customerParams.put("description", "Application customer. Username: " + payload.getUsername());
-            customerParams.put("email", payload.getEmail());
-            customerParams.put("plan", selectedPlan.getId());
-            LOG.info("Subscribing the customer to plan {}", selectedPlan.getName());
-            String stripeCustomerId = stripeService.createCustomer(stripeTokenParams, customerParams);
-            LOG.info("Username: {} has been subscribed to Stripe", payload.getUsername());
+		LOG.info("User created successfully");
 
-            user.setStripeCustomerId(stripeCustomerId);
+		model.addAttribute(SIGNED_UP_MESSAGE_KEY, "true");
 
-            registeredUser = userService.createUser(user, PlansEnum.PRO, roles);
-            LOG.debug(payload.toString());
-        }
+		return SUBSCRIPTION_VIEW_NAME;
+	}
 
+	@ExceptionHandler({ StripeException.class })
+	public ModelAndView signupException(HttpServletRequest request, Exception exception) {
 
-        // Auto logins the registered user
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                registeredUser, null, registeredUser.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+		LOG.error("Request {} raised exception {}", request.getRequestURL(), exception);
 
-        LOG.info("User created successfully");
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("exception", exception);
+		mav.addObject("url", request.getRequestURL());
+		mav.addObject("timestamp", LocalDate.now(Clock.systemUTC()));
+		mav.setViewName(GENERIC_ERROR_VIEW_NAME);
+		return mav;
+	}
 
-        model.addAttribute(SIGNED_UP_MESSAGE_KEY, "true");
+	// --------------> Private methods
 
-        return SUBSCRIPTION_VIEW_NAME;
-    }
+	/**
+	 * Checks if the username/email are duplicates and sets error flags in the
+	 * model. Side effect: the method might set attributes on Model
+	 **/
+	private void checkForDuplicates(BasicAccountPayload payload, ModelMap model) {
 
-    @ExceptionHandler({StripeException.class})
-    public ModelAndView signupException(HttpServletRequest request, Exception exception) {
+		// Username
+		if (userService.findByUserName(payload.getUsername()) != null) {
+			model.addAttribute(DUPLICATED_USERNAME_KEY, true);
+		}
+		if (userService.findByEmail(payload.getEmail()) != null) {
+			model.addAttribute(DUPLICATED_EMAIL_KEY, true);
+		}
 
-        LOG.error("Request {} raised exception {}", request.getRequestURL(), exception);
-
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("exception", exception);
-        mav.addObject("url", request.getRequestURL());
-        mav.addObject("timestamp", LocalDate.now(Clock.systemUTC()));
-        mav.setViewName(GENERIC_ERROR_VIEW_NAME);
-        return mav;
-    }
-
-
-    //--------------> Private methods
-
-    /**
-     * Checks if the username/email are duplicates and sets error flags in the model.
-     * Side effect: the method might set attributes on Model
-     **/
-    private void checkForDuplicates(BasicAccountPayload payload, ModelMap model) {
-
-        // Username
-        if (userService.findByUserName(payload.getUsername()) != null) {
-            model.addAttribute(DUPLICATED_USERNAME_KEY, true);
-        }
-        if (userService.findByEmail(payload.getEmail()) != null) {
-            model.addAttribute(DUPLICATED_EMAIL_KEY, true);
-        }
-
-    }
+	}
 }

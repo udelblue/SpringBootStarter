@@ -5,29 +5,31 @@ import org.springframework.mail.SimpleMailMessage;
 
 import com.udelblue.web.domain.frontend.FeedbackPojo;
 
-
 public abstract class AbstractEmailService implements EmailService {
 
-    @Value("${default.to.address}")
-    private String defaultToAddress;
-    /**
-     * Creates a Simple Mail Message from a Feedback Pojo.
-     * @param feedback The Feedback pojo
-     * @return
-     */
-    protected SimpleMailMessage prepareSimpleMailMessageFromFeedbackPojo(FeedbackPojo feedback) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(defaultToAddress);
-        message.setFrom(feedback.getEmail());
-        message.setReplyTo(feedback.getEmail());
-        message.setSubject("[Application]: Feedback received from " + feedback.getFirstName() + " " + feedback
-                .getLastName() + "!");
-        message.setText("User with email: " + feedback.getEmail() + " left this feedback:\n" + feedback.getFeedback());
-        return message;
-    }
+	@Value("${default.to.address}")
+	private String defaultToAddress;
 
-    @Override
-    public void sendFeedbackEmail(FeedbackPojo feedbackPojo) {
-        sendGenericEmailMessage(prepareSimpleMailMessageFromFeedbackPojo(feedbackPojo));
-    }
+	/**
+	 * Creates a Simple Mail Message from a Feedback Pojo.
+	 * 
+	 * @param feedback
+	 *            The Feedback pojo
+	 * @return
+	 */
+	protected SimpleMailMessage prepareSimpleMailMessageFromFeedbackPojo(FeedbackPojo feedback) {
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(defaultToAddress);
+		message.setFrom(feedback.getEmail());
+		message.setReplyTo(feedback.getEmail());
+		message.setSubject("[Application]: Feedback received from " + feedback.getFirstName() + " "
+				+ feedback.getLastName() + "!");
+		message.setText("User with email: " + feedback.getEmail() + " left this feedback:\n" + feedback.getFeedback());
+		return message;
+	}
+
+	@Override
+	public void sendFeedbackEmail(FeedbackPojo feedbackPojo) {
+		sendGenericEmailMessage(prepareSimpleMailMessageFromFeedbackPojo(feedbackPojo));
+	}
 }

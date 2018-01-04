@@ -3,74 +3,73 @@ package com.udelblue.backend.persistence.domain.backend;
 import javax.persistence.*;
 import java.io.Serializable;
 
-
 @Entity
 @Table(name = "user_role")
 public class UserRole implements Serializable {
 
-    /** The Serial Version UID for Serializable classes. */
-    private static final long serialVersionUID = 1L;
+	/** The Serial Version UID for Serializable classes. */
+	private static final long serialVersionUID = 1L;
 
-    public UserRole() {
+	public UserRole() {
 
-    }
+	}
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
 
-    public UserRole(User user, Role role) {
-        this.user = user;
-        this.role = role;
-    }
+	public UserRole(User user, Role role) {
+		this.user = user;
+		this.role = role;
+	}
 
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_id")
+	private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User user;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "role_id")
+	private Role role;
 
+	public User getUser() {
+		return user;
+	}
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
-    private Role role;
+	public void setUser(User user) {
+		this.user = user;
+	}
 
-    public User getUser() {
-        return user;
-    }
+	public Role getRole() {
+		return role;
+	}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public void setRole(Role role) {
+		this.role = role;
+	}
 
-    public Role getRole() {
-        return role;
-    }
+	public long getId() {
+		return id;
+	}
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
+	public void setId(long id) {
+		this.id = id;
+	}
 
-    public long getId() {
-        return id;
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
-    public void setId(long id) {
-        this.id = id;
-    }
+		UserRole userRole = (UserRole) o;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+		return id == userRole.id;
 
-        UserRole userRole = (UserRole) o;
+	}
 
-        return id == userRole.id;
-
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (id ^ (id >>> 32));
-    }
+	@Override
+	public int hashCode() {
+		return (int) (id ^ (id >>> 32));
+	}
 }

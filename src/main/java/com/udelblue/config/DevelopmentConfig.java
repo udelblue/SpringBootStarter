@@ -6,8 +6,6 @@ import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
-
 import com.udelblue.backend.service.EmailService;
 import com.udelblue.backend.service.MockEmailService;
 
@@ -15,23 +13,23 @@ import com.udelblue.backend.service.MockEmailService;
 @Profile("dev")
 public class DevelopmentConfig {
 
-    @Value("${stripe.test.private.key}")
-    private String stripeDevKey;
+	@Value("${stripe.test.private.key}")
+	private String stripeDevKey;
 
-    @Bean
-    public EmailService emailService() {
-        return new MockEmailService();
-    }
+	@Bean
+	public EmailService emailService() {
+		return new MockEmailService();
+	}
 
-    @Bean
-    public ServletRegistrationBean h2ConsoleServletRegistration() {
-        ServletRegistrationBean bean = new ServletRegistrationBean(new WebServlet());
-        bean.addUrlMappings("/console/*");
-        return bean;
-    }
+	@Bean
+	public ServletRegistrationBean h2ConsoleServletRegistration() {
+		ServletRegistrationBean bean = new ServletRegistrationBean(new WebServlet());
+		bean.addUrlMappings("/console/*");
+		return bean;
+	}
 
-    @Bean
-    public String stripeKey() {
-        return stripeDevKey;
-    }
+	@Bean
+	public String stripeKey() {
+		return stripeDevKey;
+	}
 }
