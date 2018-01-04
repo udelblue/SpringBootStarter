@@ -9,6 +9,7 @@ import com.udelblue.utils.StripeUtils;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class StripeIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void createStripeCustomer() throws Exception {
 
         Map<String, Object> tokenParams = new HashMap<String, Object>();
