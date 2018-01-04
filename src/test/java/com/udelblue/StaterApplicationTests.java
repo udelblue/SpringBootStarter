@@ -27,5 +27,13 @@ public class StaterApplicationTests {
 		String actual = i18NService.getMessage(messageId);
 		Assert.assertEquals("The actual and expected Strings don't match", expectedResult, actual);
 	}
+	
+	@Test
+	public void testMessageNotNullLocaleService() throws Exception {
+		String expectedResult = "Bootstrap starter template";
+		String messageId = "index.main.callout";
+		String actual = i18NService.getMessage(messageId);
+		Assert.assertNotNull("message is null", actual);
+	}
 
 }
