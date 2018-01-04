@@ -3,8 +3,9 @@ jdk:
 install:
 - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
-- mvn test
+- mvn spring-boot:run -Drun.jvmArguments="-Dspring.profiles.active=dev"
 cache:
   directories:
   - $HOME/.m2
-  
+services:
+  - mysql
