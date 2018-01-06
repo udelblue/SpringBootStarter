@@ -30,7 +30,6 @@ CREATE TABLE `user` (
   `phone_number` varchar(50) DEFAULT NULL,
   `country` varchar(2) DEFAULT NULL,
   `description` TEXT(500),
-  `profile_image_url` TEXT(500),
   `plan_id` tinyint(4) NOT NULL DEFAULT 1,
   `stripe_customer_id` VARCHAR(100),
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
