@@ -121,7 +121,7 @@
                                name="phoneNumber" />
                     </div>
 
-                    <!-- Additional HTML form fields for Pro Account subscription 
+                    <!-- Additional HTML form fields for Pro Account subscription -->
                     <div th:if="${#httpServletRequest.getParameter('planId') == #strings.toString(T(com.udelblue.enums.PlansEnum).PRO.getId())}">
                         <div class="form-group">
                             <label for="cardNumber" th:text="#{signup.form.credit.card.number}"></label>
@@ -166,7 +166,7 @@
                             </select>
                         </div>
                     </div>
--->
+
                     <button type="submit" class="btn btn-primary" th:text="#{form.submit}"></button>
 
                 </form>
