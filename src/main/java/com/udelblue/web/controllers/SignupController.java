@@ -146,26 +146,49 @@ public class SignupController {
 		if (planId == PlansEnum.BASIC.getId()) {
 			roles.add(new UserRole(user, new Role(RolesEnum.BASIC)));
 			registeredUser = userService.createUser(user, PlansEnum.BASIC, roles);
-			// Auto logins the registered user
-			Authentication auth = new UsernamePasswordAuthenticationToken(registeredUser, null,
-					registeredUser.getAuthorities());
-			SecurityContextHolder.getContext().setAuthentication(auth);
-			LOG.info("User created successfully");
-			return "redirect:/payload";
-			/*
-			 * model.addAttribute(SIGNED_UP_MESSAGE_KEY, "true");
-			 * 
-			 * return SUBSCRIPTION_VIEW_NAME;
-			 */
-
 		} else {
-			roles.add(new UserRole(user, new Role(RolesEnum.BASIC)));
-			registeredUser = userService.createUser(user, PlansEnum.BASIC, roles);
-			Authentication auth = new UsernamePasswordAuthenticationToken(registeredUser, null,
-					registeredUser.getAuthorities());
-			SecurityContextHolder.getContext().setAuthentication(auth);
-			return "redirect:/payment?planId=" + Integer.toString(planId);
+			roles.add(new UserRole(user, new Role(RolesEnum.PRO)));
+
+			// Extra precaution in case the POST method is invoked programmatically
+			if (StringUtils.isEmpty(payload.getCardCode()) || StringUtils.isEmpty(payload.getCardNumber())
+					|| StringUtils.isEmpty(payload.getCardMonth()) || StringUtils.isEmpty(payload.getCardYear())) {
+				LOG.error("One or more credit card fields is null or empty. Returning error to the user");
+				model.addAttribute(SIGNED_UP_MESSAGE_KEY, "false");
+				model.addAttribute(ERROR_MESSAGE_KEY, "One of more credit card details is null or empty.");
+				return SUBSCRIPTION_VIEW_NAME;
+
+			}
+
+			// If the user has selected the pro account, creates the Stripe customer to
+			// store the stripe customer id in
+			// the db
+			Map<String, Object> stripeTokenParams = StripeUtils.extractTokenParamsFromSignupPayload(payload);
+
+			Map<String, Object> customerParams = new HashMap<String, Object>();
+			customerParams.put("description", "Application customer. Username: " + payload.getUsername());
+			customerParams.put("email", payload.getEmail());
+			customerParams.put("plan", selectedPlan.getId());
+			LOG.info("Subscribing the customer to plan {}", selectedPlan.getName());
+			String stripeCustomerId = stripeService.createCustomer(stripeTokenParams, customerParams);
+			LOG.info("Username: {} has been subscribed to Stripe", payload.getUsername());
+
+			user.setStripeCustomerId(stripeCustomerId);
+
+			registeredUser = userService.createUser(user, PlansEnum.PRO, roles);
+			LOG.debug(payload.toString());
 		}
+
+		// Auto logins the registered user
+		Authentication auth = new UsernamePasswordAuthenticationToken(registeredUser, null,
+				registeredUser.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(auth);
+
+		LOG.info("User created successfully");
+
+		model.addAttribute(SIGNED_UP_MESSAGE_KEY, "true");
+
+		return SUBSCRIPTION_VIEW_NAME;
+
 
 	}
 
