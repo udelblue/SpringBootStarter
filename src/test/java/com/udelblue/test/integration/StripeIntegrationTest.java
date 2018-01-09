@@ -52,7 +52,7 @@ public class StripeIntegrationTest {
 		Stripe.apiKey = stripeKey;
 	}
 
-	@Test
+/*	@Test
 	@Ignore
 	public void createStripeCustomer() throws Exception {
 
@@ -74,5 +74,5 @@ public class StripeIntegrationTest {
 		Customer cu = Customer.retrieve(stripeCustomerId);
 		cu.delete();
 
-	}
+	}*/
 }
