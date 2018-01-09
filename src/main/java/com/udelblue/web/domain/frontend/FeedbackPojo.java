@@ -2,6 +2,10 @@ package com.udelblue.web.domain.frontend;
 
 import java.io.Serializable;
 
+/**
+ * Contains contact information that users have filled in the contact form.
+ *
+ */
 public class FeedbackPojo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
