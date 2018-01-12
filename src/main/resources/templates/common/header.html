@@ -2,24 +2,35 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="common-header">
 
-    <title>Starter Skeleton</title>
+<title>Starter Skeleton</title>
 
-    <!-- Bootstrap core CSS -->
-    <link th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}"
-          rel="stylesheet" media="screen" />
+<!-- favicon -->
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+<link rel="icon" href="/favicon.ico" type="image/x-icon"/>
 
-    <!-- Custom styles for this template -->
-    <link type="text/css" th:href="@{/css/styles.css}" rel="stylesheet" media="screen"/>
+<link type="text/css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet"
+	media="screen" /> 
 
-    <!-- Form validation -->
-    <link type="text/css" th:href="@{/css/formValidation.min.css}" rel="stylesheet" media="screen"/>
+<!-- Custom styles for this template -->
+<link type="text/css" th:href="@{/css/updatedstyles.css}"
+	rel="stylesheet" media="screen" />
+
+<!-- Fonts -->
+ <link
+	href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" /> 
 
 </head>
-    <div th:fragment="before-body-scripts">
-        <script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
-        <script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
-        <script th:src="@{/js/starterskeleton.js}"></script>
-        <script th:src="@{/js/formValidation.min.js}"></script>
-        <script th:src="@{/js/bootstrap.min.js}"></script>
-    </div>
+<div th:fragment="before-body-scripts">
+	<script th:src="@{/js/jquery-3.2.1.slim.min.js}"></script>
+		<script th:src="@{/js/popper.min.js}"></script>
+		<script th:src="@{/js/formValidation.min.js}"></script>
+		<script th:src="@{/js/bootstrap.min.js}"></script>
+
+	<script th:src="@{/js/starterskeleton.js}"></script>
+		
+
+</div>
 </html>

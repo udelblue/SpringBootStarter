@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/header :: common-header" />
+
+
+<body>
+
+	<div th:replace="common/navbar :: common-navbar" />
+
+	<div class="container">
+
+		<div class="row">
+
+			<div class="col-md-6 col-md-offset-3">
+
+
+				<!-- <div th:if="${signedUp != null}">
+					<div th:if="${signedUp == 'true'}"
+						class="alert alert-success alert-dismissible" role="alert">
+						<button type="button" class="close" data-dismiss="alert"
+							aria-label="Close">
+							<span aria-hidden="true">x</span>
+						</button>
+						<p th:text="#{signup.profile.created.success}" class="text-center" />
+					</div>
+					<div th:if="${signedUp == 'false'}"
+						class="alert alert-danger alert-dismissible" role="alert">
+						<button type="button" class="close" data-dismiss="alert"
+							aria-label="Close">
+							<span aria-hidden="true">x</span>
+						</button>
+						<p th:text="${message}" class="text-center" />
+					</div>
+				</div>
+ -->
+				<div class="well">
+
+			<!-- 		<h1 th:if="${#httpServletRequest.getParameter('planId') == '1'}"
+						th:text="#{signup.h1.basic.profile}"></h1>
+					<h1 th:if="${#httpServletRequest.getParameter('planId') == '2'}"
+						th:text="#{signup.h1.pro.profile}"></h1> -->
+					<p class="lead">Please provide payment information.</p>
+
+					<form id="signupForm" th:action="@{/payment}"
+						th:object="${__${T(com.udelblue.web.controllers.PaymentController).PAYLOAD_MODEL_KEY_NAME}__}"
+						method="post" class="text-left" enctype="multipart/form-data">
+
+						<!-- Hidden field for the POST request -->
+						<div th:if="${param.containsKey('planId')}">
+							<input type="hidden" name="planId"
+								th:value="${#httpServletRequest.getParameter('planId')}" />
+						</div>
+
+						<!-- Additional HTML form fields for Pro Account subscription -->
+						<div class="form-group">
+							<label for="cardNumber"
+								th:text="#{signup.form.credit.card.number}"></label> <input
+								type="text" id="cardNumber" th:field="*{cardNumber}"
+								class="form-control" />
+						</div>
+						<div class="form-group">
+							<label for="cardCode" id="cardCode"
+								th:text="#{signup.form.cvv.number}"></label> <input type="text"
+								th:field="*{cardCode}" class="form-control" />
+						</div>
+						<div class="form-group">
+							<label for="cardMonth" th:text="#{signup.form.card.expiration}"></label>
+							<select id="cardMonth" name="cardMonth">
+								<option value="1">1 - January</option>
+								<option value="2">2 - February</option>
+								<option value="3">3 - March</option>
+								<option value="4">4 - April</option>
+								<option value="5">5 - May</option>
+								<option value="6">6 - June</option>
+								<option value="7">7 - July</option>
+								<option value="8">8 - August</option>
+								<option value="9">9 - September</option>
+								<option value="10">10 - October</option>
+								<option value="11">11 - November</option>
+								<option value="12">12 - December</option>
+							</select> <select id="cardYear" name="cardYear">
+								<option value="2018">2018</option>
+								<option value="2019">2019</option>
+								<option value="2020">2020</option>
+								<option value="2021">2021</option>
+								<option value="2022">2022</option>
+								<option value="2023">2023</option>
+								<option value="2024">2024</option>
+								<option value="2025">2025</option>
+								<option value="2026">2026</option>
+								<option value="2027">2027</option>
+								<option value="2028">2028</option>
+								<option value="2029">2029</option>
+								<option value="2030">2030</option>
+								<option value="2031">2031</option>
+								<option value="2032">2032</option>
+							</select>
+						</div>
+
+						<button type="submit" class="btn btn-primary"
+							th:text="#{form.submit}"></button>
+
+					</form>
+
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+	<!-- /.container -->
+
+	<!-- Bootstrap core JavaScript
+================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<div th:replace="common/header :: before-body-scripts" />
+
+</body>
+</html>

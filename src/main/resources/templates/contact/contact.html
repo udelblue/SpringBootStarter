@@ -9,7 +9,7 @@
 
     <div class="container">
 
-        <div class="row">
+      <!--   <div class="row">
 
             <div class="col-md-6 col-md-offset-3">
 
@@ -54,13 +54,81 @@
                     </div>
                 </div>
             </div>
+        </div> -->
+        
+        
+        
+        
+        <section class="fdb-block pt-0">
+  
+    <div class="container">
+      <div class="row mt-5">
+        <div class="col-12 col-md-6 col-lg-5">
+          <h2>Contact Us</h2>
+          <p class="text-h3">
+            Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove.
+          </p>
+
+          <p class="text-h3">
+            It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
+          </p>
+
+
+          <p class="text-h3 mt-5">
+            <strong>Email:</strong> <a href="Email:hello@website.com">hello@website.com</a>
+          </p>
+          <p class="text-h3">
+            <strong>Phone:</strong> <a href="#">+44 123 123 1232</a>
+          </p>
         </div>
+
+        <div class="col-12 col-md-6 ml-auto pt-5 pt-md-0">
+          <form>
+            <div class="row">
+              <div class="col">
+                <input type="text" placeholder="First name" class="form-control"/>
+              </div>
+              <div class="col">
+                <input type="text" placeholder="Last name" class="form-control"/>
+              </div>
+            </div>
+
+            <div class="row mt-4">
+              <div class="col">
+                <input type="email" placeholder="Enter email" class="form-control" />
+              </div>
+            </div>
+
+            <div class="row mt-4">
+              <div class="col">
+                <input type="email" placeholder="Subject" class="form-control"/>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col">
+                <textarea placeholder="How can we help?" rows="3" name="message" class="form-control"></textarea>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col">
+                <button class="btn" type="submit">Submit</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+        
+        
     </div>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <div th:replace="common/header :: before-body-scripts" />
+
+	 <div th:replace="common/footer :: common-footer" />
 
 </body>
 </html>

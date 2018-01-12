@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="common/header :: common-header" />
+
+<body>
+
+    <div th:replace="common/navbar :: common-navbar" />
+
+	<section class="fdb-block">
+			<div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-md-12">
+
+                <div class="jumbotron">
+
+                    <div class="text-center">
+
+                        <h1 th:text="#{payload.h1.text}" />
+
+                        <p class="lead" th:text="#{payload.p.lead}" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <div th:replace="common/header :: before-body-scripts" />
+
+</body>
+</html>

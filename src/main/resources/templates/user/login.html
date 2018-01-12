@@ -6,10 +6,10 @@
 <body>
 
     <div th:replace="common/navbar :: common-navbar" />
+	<section class="fdb-block">
+			<div class="container">
 
-    <div class="container">
-
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-md-6 col-md-offset-3 text-center">
 
                 <div th:if="${param.error}" class="alert alert-danger alert-dismissible" role="alert">
@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row justify-content-center">
 
             <div class="col-md-6 col-md-offset-3">
 
@@ -71,7 +71,7 @@
         </div>
 
     </div>
-
+</section>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

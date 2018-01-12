@@ -3,36 +3,61 @@
 
 <body>
 
-    <div th:fragment="common-navbar" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a th:text="#{navbar.home.text}" href="/"></a></li>
-                    <li><a th:text="#{navbar.about.text}" href="/about"></a></li>
-                    <li><a th:text="#{navbar.contact.text}" href="/contact"></a></li>
-                </ul>
 
-                <ul class="nav navbar-nav navbar-right">
-                    <li th:if="${#authorization.expression('!isAuthenticated()')}">
-                        <a th:href="@{/login}" th:text="#{navbar.login.text}" />
-                    </li>
-                    <li th:if="${#authorization.expression('isAuthenticated()')}">
-                        <form id="f" th:action="@{/logout}" method="post" role="form" class="navbar-form">
-                            <button type="submit" th:text="#{navbar.logout.text}" class="btn btn-primary" />
-                        </form>
-                    </li>
-                </ul>
-            </div><!--/.nav-collapse -->
-        </div>
-    </div>
+	<div th:fragment="common-navbar">
+		<header>
+			<div class="container">
+				<nav class="navbar navbar-expand-md no-gutters">
+					<div class="col-3 text-left">
+						<a href="/"> <img height="30" alt="image"
+							th:src="@{/images/img_logo.png}" />
+						</a>
+					</div>
+
+					<button aria-label="Toggle navigation" aria-expanded="false"
+						aria-controls="navbarNav7" data-target=".navbar-collapse-2"
+						data-toggle="collapse" type="button" class="navbar-toggler">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+
+					<div id="navbarNav7"
+						class="collapse navbar-collapse navbar-collapse-2 justify-content-center col-md-6">
+						<ul class="navbar-nav justify-content-center">
+							<li class="nav-item active"><a href="/"
+								class="nav-link">Home <span class="sr-only">(current)</span></a>
+							</li>
+							<li class="nav-item"><a href="/features"
+								class="nav-link">Features</a></li>
+							<li class="nav-item"><a href="/pricing"
+								class="nav-link">Pricing</a></li>
+							<li class="nav-item"><a href="/team"
+								class="nav-link">Team</a></li>
+							<li class="nav-item"><a href="/contact"
+								class="nav-link">Contact</a></li>
+						</ul>
+					</div>
+
+					<div class="collapse navbar-collapse navbar-collapse-2">
+						<ul class="navbar-nav ml-auto justify-content-end">
+							<li class="nav-item"
+								th:if="${#authorization.expression('!isAuthenticated()')}">
+								<a href="/login" class="nav-link">Log In</a>
+							</li>
+							<li th:if="${#authorization.expression('isAuthenticated()')}">
+								<form id="f" th:action="@{/logout}" method="post" role="form"
+									class="navbar-form">
+									<button type="submit" th:text="#{navbar.logout.text}"
+										class="btn btn-primary" />
+								</form>
+							</li>
+						</ul>
+
+					</div>
+				</nav>
+			</div>
+		</header>
+	</div>
+
 
 </body>
 </html>
