@@ -189,7 +189,6 @@ public class SignupController {
 
 		return SUBSCRIPTION_VIEW_NAME;
 
-
 	}
 
 	@ExceptionHandler({ StripeException.class })
